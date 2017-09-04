@@ -1,0 +1,142 @@
+#!/bin/bash -e
+
+# ------------------------------------------------------------------------------
+# SETUP
+# ------------------------------------------------------------------------------
+DOTFILES_ROOT=$(pwd -P)
+echo ''
+
+# ------------------------------------------------------------------------------
+# FUNCTIONS
+# ------------------------------------------------------------------------------
+info () {
+  printf "\r[ \033[00;34m..\033[0m ] $1\n"
+}
+
+user () {
+  printf "\r[ \033[0;33m??\033[0m ] $1\n"
+}
+
+success () {
+  printf "\r\033[2K[ \033[00;32mOK\033[0m ] $1\n"
+}
+
+fail () {
+  printf "\r\033[2K[\033[0;31mFAIL\033[0m] $1\n"
+  echo ''
+  exit
+}
+
+link_file () {
+  local src=$1 dst=$2
+  local overwrite= backup= skip=
+  local action=
+  if [ -f "$dst" -o -d "$dst" -o -L "$dst" ]
+  then
+    if [ "$overwrite_all" == "false" ] && [ "$backup_all" == "false" ] && [ "$skip_all" == "false" ]
+    then
+      local currentSrc="$(readlink $dst)"
+      if [ "$currentSrc" == "$src" ]
+      then
+        skip=true;
+      else
+        user "File already exists: $dst ($(basename "$src")), what do you want to do?\n\
+        [s]kip, [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all?"
+        read -n 1 action
+        case "$action" in
+          o )
+            overwrite=true;;
+          O )
+            overwrite_all=true;;
+          b )
+            backup=true;;
+          B )
+            backup_all=true;;
+          s )
+            skip=true;;
+          S )
+            skip_all=true;;
+          * )
+            ;;
+        esac
+      fi
+    fi
+
+    overwrite=${overwrite:-$overwrite_all}
+    backup=${backup:-$backup_all}
+    skip=${skip:-$skip_all}
+
+    if [ "$overwrite" == "true" ]
+    then
+      rm -rf "$dst"
+      success "removed $dst"
+    fi
+
+    if [ "$backup" == "true" ]
+    then
+      mv "$dst" "${dst}.backup"
+      success "moved $dst to ${dst}.backup"
+    fi
+
+    if [ "$skip" == "true" ]
+    then
+      success "skipped $src"
+    fi
+  fi
+
+  if [ "$skip" != "true" ]
+  then # "false" or empty
+    ln -s "$1" "$2"
+    success "symlinked $1 to $2"
+  fi
+}
+
+symlink_dotfiles () {
+  info 'symlinking dotfiles'
+
+  local overwrite_all=false backup_all=false skip_all=false
+
+  for src in $(find -H "$DOTFILES_ROOT" -maxdepth 2 -name '*.symlink' -not -path '*.git*')
+  do
+    dst="$HOME/.$(basename "${src%.*}")"
+    link_file "$src" "$dst"
+  done
+}
+
+# ------------------------------------------------------------------------------
+# PERFORM INSTALL
+# ------------------------------------------------------------------------------
+symlink_dotfiles
+
+if [ "$(uname -s)" == "Darwin" ]
+then
+  info 'Setting up apple things'
+
+  link_file $DOTFILES_ROOT/bash/bashrc $HOME/.bash_profile
+
+  info 'setting good macOS defaults'
+  $DOTFILES_ROOT/macos/set-defaults.sh
+  success 'macOS defaults set'
+
+  info 'installing homebrew if not installed'
+  $DOTFILES_ROOT/macos/install.sh 2>&1
+  success 'homebrew installed'
+
+  info 'running brew update'
+  brew update
+  success 'brew update complete'
+
+  info 'running brew bundle'
+  cd $DOTFILES_ROOT/macos
+  brew bundle
+  cd $DOTFILES_ROOT
+  success 'brew bundle complete'
+
+  info 'Installing updates from the Apple App Store'
+  sudo softwareupdate -i -a
+
+else
+  link_file $DOTFILES_ROOT/bash/bashrc $HOME/.bashrc
+fi
+
+success ' dotfiles install complete'

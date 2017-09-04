@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ "$(uname -s)" == "Darwin" ]
+then
+  sysctl -n machdep.cpu.brand_string
+else
+  cat /proc/cpuinfo
+fi

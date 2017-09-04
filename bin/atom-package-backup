@@ -1,0 +1,9 @@
+#!/bin/bash -e
+#
+# Usage: atom-package-backup
+#
+# Saves a list of your currently installed atom packages to
+# ~/.dotfiles/atom.symlink/packages.txt suitable for install
+# via atom-package-install
+
+apm list --installed --bare > ~/.dotfiles/atom.symlink/packages.txt

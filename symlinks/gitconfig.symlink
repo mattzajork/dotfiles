@@ -1,0 +1,47 @@
+[include]
+    path = ~/.gitconfig.local
+[hub]
+    protocol = https
+[alias]
+    aa            = add --all
+    ap            = add --patch
+    branches      = for-each-ref --sort=-committerdate --format=\"%(color:blue)%(authordate:relative)\t%(color:red)%(authorname)\t%(color:white)%(color:bold)%(refname:short)\" refs/remotes
+    ci            = commit -v
+    co            = checkout
+    cob           = checkout -b
+    pf            = push --force-with-lease
+    st            = status
+    lastchange    = log -p --follow -n 1
+    unstage       = reset HEAD --
+    clog          = log --pretty=format:\"%Cblue%h\t%Cred%an\t%C(white)%ar : %s\"
+    stats         = shortlog -sn
+[color]
+    diff = auto
+    status = auto
+    branch = auto
+    ui = true
+[core]
+    autocrlf = input
+    excludesfile = ~/.gitignore_global
+    editor = vim
+[apply]
+    whitespace = nowarn
+[mergetool]
+    keepBackup = false
+[difftool]
+    prompt = false
+[help]
+    autocorrect = 1
+[commit]
+    template = ~/.gitmessage
+[push]
+    # See `git help config` (search for push.default)
+    # for more information on different options of the below setting.
+    # Setting to git 2.0 default to suppress warning message
+    default = simple
+[merge]
+    ff = only
+[fetch]
+    prune = true
+[rebase]
+    autosquash = true

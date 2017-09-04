@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+[ -f .git/hooks/ctags ] || git init
+.git/hooks/ctags
