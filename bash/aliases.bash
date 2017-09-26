@@ -1,6 +1,6 @@
 alias reloadcli="source $HOME/.bashrc"
 alias c="clear"
-alias l="ls -ahlF"
+alias l="ls -ahlF --color=auto"
 alias pubkey="cat $HOME/.ssh/id_rsa.pub"
 alias weather="curl -4 http://wttr.in"
 alias togit="cd $HOME/git"
