@@ -1,7 +1,7 @@
 # Install
 
 ```
-git clone https://github.com/mzajork/dotfiles.git ~/.dotfiles
+git clone https://github.com/mattzajork/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 ./install
 ```
