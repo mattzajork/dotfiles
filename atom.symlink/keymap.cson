@@ -1,0 +1,3 @@
+'.tree-view':
+  'down': 'custom:expand-item-down',
+  'up': 'custom:expand-item-up'
