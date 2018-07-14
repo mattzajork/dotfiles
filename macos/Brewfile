@@ -21,6 +21,8 @@ brew 'tmux'
 brew 'vim'
 brew 'wget'
 brew 'youtube-dl'
+brew 'ipcalc'
+brew 'ipv6calc'
 
 cask 'atom'
 cask 'bettertouchtool'
