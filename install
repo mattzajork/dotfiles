@@ -106,6 +106,12 @@ symlink_dotfiles () {
 # ------------------------------------------------------------------------------
 # PERFORM INSTALL
 # ------------------------------------------------------------------------------
+
+# backup existing bashrc
+if [ ! -f ~/.bashrc ]; then
+  mv ~/.bashrc ~/.bashrc.dotfiles.bak
+fi
+
 symlink_dotfiles
 
 if [ "$(uname -s)" == "Darwin" ]
