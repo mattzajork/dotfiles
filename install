@@ -114,8 +114,7 @@ fi
 
 symlink_dotfiles
 
-if [ "$(uname -s)" == "Darwin" ]
-then
+if [ "$(uname -s)" == "Darwin" ]; then
   info 'Setting up apple things'
 
   link_file $DOTFILES_ROOT/bash/bashrc $HOME/.bash_profile
