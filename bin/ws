@@ -1,0 +1,30 @@
+#!/bin/bash
+
+CAPTURE_FILE="/tmp/remotecapture.fifo"
+
+echo "Make sure tcpdump is installed on the target..."
+
+if [ "$#" -ne 1 ]; then
+  echo "Usage: ws user@[servername|ip address]"
+  exit 1
+fi
+
+if ! [ -x "$(command -v wireshark)" ]; then
+  echo "Error: wireshark is not installed." >&2
+  exit 1
+fi
+
+function cleanup {
+  echo "Removing $CAPTURE_FILE"
+  rm $CAPTURE_FILE
+}
+
+trap cleanup EXIT KILL SIGINT SIGTERM SIGKILL SIGTERM SIGHUP
+
+if [ ! -f $CAPTURE_FILE ]; then
+  mkfifo $CAPTURE_FILE
+fi
+
+ssh $1 "sudo tcpdump -s 0 -n -w - -U -i ens32 not port 22" > $CAPTURE_FILE
+wireshark -kni $CAPTURE_FILE
+
