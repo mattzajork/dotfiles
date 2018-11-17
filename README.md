@@ -6,7 +6,7 @@ cd ~/.dotfiles
 ./install
 ```
 
-To finalize Vim customization:
+## To finalize Vim customization:
 
 ```
 vim
