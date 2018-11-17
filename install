@@ -106,38 +106,9 @@ symlink_dotfiles () {
 # ------------------------------------------------------------------------------
 # PERFORM INSTALL
 # ------------------------------------------------------------------------------
-
 symlink_dotfiles
 
-if [ "$(uname -s)" == "Darwin" ]; then
-  info 'Setting up apple things'
-
-  link_file $DOTFILES_ROOT/bash/bashrc $HOME/.bash_profile
-
-  info 'setting good macOS defaults'
-  $DOTFILES_ROOT/macos/set-defaults.sh
-  success 'macOS defaults set'
-
-  info 'installing homebrew if not installed'
-  $DOTFILES_ROOT/macos/install.sh 2>&1
-  success 'homebrew installed'
-
-  info 'running brew update'
-  brew update
-  success 'brew update complete'
-
-  info 'running brew bundle'
-  cd $DOTFILES_ROOT/macos
-  brew bundle
-  cd $DOTFILES_ROOT
-  success 'brew bundle complete'
-
-  info 'Installing updates from the Apple App Store'
-  sudo softwareupdate -i -a
-
-else
-  link_file $DOTFILES_ROOT/bash/bashrc $HOME/.bashrc
-fi
+link_file $DOTFILES_ROOT/bash/bashrc $HOME/.bashrc
 
 if [[ ! -e ~/.vim/autoload/plug.vim ]]; then
   if [ -x "$(command -v curl)" ]; then
