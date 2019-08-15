@@ -1,3 +1,0 @@
-#!/bin/bash
-#git rev-parse --abbrev-ref HEAD
-git branch | grep '\*' | awk '{print $2}'
