@@ -123,4 +123,6 @@ fi
 # ------------------------------------------------------------------------------
 # PATH
 # ------------------------------------------------------------------------------
-export PATH="$BSH/bin:$PATH"
+export GOPATH="$HOME/go-workspace"
+export GOROOT=/usr/local/go
+export PATH="$BSH/bin:$PATH:$GOPATH/bin"
