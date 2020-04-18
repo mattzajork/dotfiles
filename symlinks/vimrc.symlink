@@ -14,7 +14,7 @@ set autowrite     " Automatically :write before running commands
 set nolist        " hide invisibles/specials
 set clipboard=unnamed
 
-colo industry
+source $HOME/.vim/bundle/malokai.vim/colors/*
 
 let g:netrw_banner = 0
 let g:netrw_liststyle = 3
@@ -85,10 +85,6 @@ if executable('ag')
     nnoremap \ :Ag<SPACE>
   endif
 endif
-
-" Make it obvious where 80 characters is
-"set textwidth=80
-"set colorcolumn=+1
 
 " Numbers
 set number
@@ -171,11 +167,14 @@ set nowrap
 
 call plug#begin('~/.vim/bundle')
 
-" Define bundles via Github repos
+" vim-plug
 Plug 'christoomey/vim-run-interactive'
 Plug 'ctrlpvim/ctrlp.vim'
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'janko-m/vim-test'
+Plug 'kiddos/malokai.vim'
 Plug 'pbrisbin/vim-mkdir'
+Plug 'preservim/nerdtree'
 Plug 'scrooloose/syntastic'
 Plug 'slim-template/vim-slim'
 Plug 'tpope/vim-endwise'
@@ -185,8 +184,8 @@ Plug 'tpope/vim-projectionist'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-rhubarb'
 Plug 'tpope/vim-surround'
+Plug 'vim-airline/vim-airline'
 Plug 'vim-scripts/tComment'
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
 if filereadable(expand("~/.vimrc.bundles.local"))
   source ~/.vimrc.bundles.local
