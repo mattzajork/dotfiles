@@ -4,16 +4,15 @@ RED='\033[0;31m'
 GREEN='\033[1;32m'
 YELLOW='\033[1;33m'
 LIGHT_BLUE='\033[1;34m'
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+DIR="$(pwd)"
 
 echo -e "${GREEN}[+] subrecon starting on $1${NC}"
 
 subfinder -d $1 -silent -o $DIR/$1.subfinder.out -all
-
 amass enum -active -config /root/config.ini -d $1 -o $DIR/$1.amass.out
 
 cat $DIR/{$1.amass.out,$1.subfinder.out} | sort -u > $DIR/$1.subdomains
-
 rm $DIR/{$1.amass.out,$1.subfinder.out} 
 
 echo -e "${GREEN}[+] subrecon on $1 complete${NC}"
+echo "subrecon on $1 complete" | notify
