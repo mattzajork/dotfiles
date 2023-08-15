@@ -7,12 +7,22 @@ LIGHT_BLUE='\033[1;34m'
 DIR="$(pwd)"
 
 echo -e "${GREEN}[+] subrecon starting on $1${NC}"
+echo "subrecon starting on $1" | notify
 
-subfinder -d $1 -silent -o $DIR/$1.subfinder.out -all
-amass enum -active -config /root/config.ini -d $1 -o $DIR/$1.amass.out
+subfinder_file=$(mktemp)
+amass_file=$(mktemp)
 
-cat $DIR/{$1.amass.out,$1.subfinder.out} | sort -u > $DIR/$1.subdomains
-rm $DIR/{$1.amass.out,$1.subfinder.out} 
+subfinder -d $1 -silent -o $subfinder_file -all
+amass enum -silent -passive -config /root/config.ini -d $1 -o $amass_file
+
+combined_file=$(mktemp)
+
+cat $amass_file $subfinder_file | sort -u > $combined_file
+cat $combined_file > $DIR/$1
+
+rm $subfinder_file
+rm $amass_file
+rm $combined_file
 
 echo -e "${GREEN}[+] subrecon on $1 complete${NC}"
 echo "subrecon on $1 complete" | notify
