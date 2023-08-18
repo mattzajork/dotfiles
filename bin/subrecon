@@ -1,28 +1,51 @@
 #!/bin/bash
+if [ "$EUID" -ne 0 ]
+  then echo "Run this script as root. Exiting."
+  exit 0
+fi
+
 NC='\033[0m'
 RED='\033[0;31m'
 GREEN='\033[1;32m'
 YELLOW='\033[1;33m'
 LIGHT_BLUE='\033[1;34m'
-DIR="$(pwd)"
+DIR="/root"
 
-echo -e "${GREEN}[+] subrecon starting on $1${NC}"
-echo "subrecon starting on $1" | notify
+echo -e "${GREEN}[+] subrecon starting on $1 at $(date)${NC}"
+echo "subrecon starting on $1 at $(date)" | notify -silent &>/dev/null
 
+mkdir -p "$DIR/recon/$1"
+project_directory="$DIR/recon/$1"
+
+# amass and subfinder
 subfinder_file=$(mktemp)
 amass_file=$(mktemp)
 
-subfinder -d $1 -silent -o $subfinder_file -all
-amass enum -silent -passive -config /root/config.ini -d $1 -o $amass_file
+subfinder -d $1 -o $subfinder_file -all &>/dev/null &
+proc1=$!
+amass enum -passive -config /root/config.ini -d $1 -o $amass_file &>/dev/null &
+proc2=$!
 
+wait $proc1
+wait $proc2
+
+# process files
 combined_file=$(mktemp)
-
 cat $amass_file $subfinder_file | sort -u > $combined_file
-cat $combined_file > $DIR/$1
+cat $combined_file > $project_directory/$1.subs
+final_file=$project_directory/$1.subs
+
+# sub bruteforcing
+puredns_file=$(mktemp)
+puredns bruteforce /opt/2m-subdomains.txt "$1" -r /root/resolvers.txt -w $puredns_file &>/dev/null
+cat $puredns_file | anew $final_file
 
 rm $subfinder_file
 rm $amass_file
 rm $combined_file
+rm $puredns_file
 
-echo -e "${GREEN}[+] subrecon on $1 complete${NC}"
-echo "subrecon on $1 complete" | notify
+httpx -nc -sc -cl -title -p 80,443,8000,8080,8443 -t 100 -retries 0 -sr -srd $project_directory/ -store-chain -o $project_directory/$1.httpx < $final_file &>/dev/null
+
+echo -e "${GREEN}[+] subrecon on $1 complete at $(date)${NC}"
+echo "subrecon on $1 complete at $(date)" | notify -silent &>/dev/null
