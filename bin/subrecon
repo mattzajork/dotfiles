@@ -4,15 +4,7 @@ if [ "$EUID" -ne 0 ]
   exit 0
 fi
 
-NC='\033[0m'
-RED='\033[0;31m'
-GREEN='\033[1;32m'
-YELLOW='\033[1;33m'
-LIGHT_BLUE='\033[1;34m'
-DIR="/root"
-
-echo -e "${GREEN}[+] subrecon starting on $1 at $(date)${NC}"
-echo "subrecon starting on $1 at $(date)" | notify -silent &>/dev/null
+echo "subrecon starting on $1 at $(date)" | notify -silent
 
 mkdir -p "$DIR/recon/$1"
 project_directory="$DIR/recon/$1"
@@ -30,22 +22,21 @@ wait $proc1
 wait $proc2
 
 # process files
-combined_file=$(mktemp)
-cat $amass_file $subfinder_file | sort -u > $combined_file
-cat $combined_file > $project_directory/$1.subs
 final_file=$project_directory/$1.subs
-
-# sub bruteforcing
-puredns_file=$(mktemp)
-puredns bruteforce /opt/2m-subdomains.txt "$1" -r /root/resolvers.txt -w $puredns_file &>/dev/null
-cat $puredns_file | anew $final_file
+cat $amass_file $subfinder_file | sort -u > $final_file
 
 rm $subfinder_file
 rm $amass_file
-rm $combined_file
+
+# sub bruteforcing of apex
+puredns_file=$(mktemp)
+puredns bruteforce /opt/2m-subdomains.txt "$1" -r /root/resolvers.txt -w $puredns_file &>/dev/null
+cat $puredns_file | anew $final_file &>/dev/null
 rm $puredns_file
 
-httpx -nc -sc -cl -title -p 80,443,8000,8080,8443 -t 100 -retries 0 -sr -srd $project_directory/ -store-chain -o $project_directory/$1.httpx < $final_file &>/dev/null
+httpx -nc -sc -cl -title -p 80,443,8000,8080,8443 -t 100 -retries 0 -o $project_directory/$1.httpx < $final_file &>/dev/null
 
-echo -e "${GREEN}[+] subrecon on $1 complete at $(date)${NC}"
-echo "subrecon on $1 complete at $(date)" | notify -silent &>/dev/null
+# this was causing an issue where no output was generated 
+# httpx -nc -sc -cl -title -p 80,443,8000,8080,8443 -t 100 -retries 0 -sr -srd $project_directory -store-chain -o $project_directory/$1.httpx < $final_file &>/dev/null
+
+echo "subrecon on $1 complete at $(date)" | notify -silent

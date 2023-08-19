@@ -9,3 +9,5 @@ alias wanip="curl ipinfo.io"
 alias pws="keepassxc ~/Documents/database.kdbx &"
 alias sc="import png:- | xclip -selection clipboard -t image/png"
 alias rustscan='docker run -it --rm --name rustscan rustscan/rustscan:2.1.1'
+alias vim='nvim'
+alias vi='nvim'

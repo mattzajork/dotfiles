@@ -13,8 +13,10 @@ set laststatus=2  " Always display the status line
 set autowrite     " Automatically :write before running commands
 set nolist        " hide invisibles/specials
 set clipboard=unnamed
+set mouse=a
+set paste
 
-source $HOME/.vim/bundle/malokai.vim/colors/*
+source $HOME/.vim/colors/*
 
 let g:netrw_banner = 0
 let g:netrw_liststyle = 3
@@ -151,12 +153,6 @@ let g:syntastic_eruby_ruby_quiet_messages =
 
 " Always use vertical diffs
 set diffopt+=vertical
-
-" Local config
-"if filereadable($HOME . "/.vimrc.local")
-""  source ~/.vimrc.local
-"endif
-
 set foldmethod=indent
 set foldnestmax=10
 set nofoldenable
@@ -164,31 +160,3 @@ set foldlevel=1
 vnoremap // y/<C-R>"<CR>
 set relativenumber
 set nowrap
-
-call plug#begin('~/.vim/bundle')
-
-" vim-plug
-Plug 'christoomey/vim-run-interactive'
-Plug 'ctrlpvim/ctrlp.vim'
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-Plug 'janko-m/vim-test'
-Plug 'kiddos/malokai.vim'
-Plug 'pbrisbin/vim-mkdir'
-Plug 'preservim/nerdtree'
-Plug 'scrooloose/syntastic'
-Plug 'slim-template/vim-slim'
-Plug 'tpope/vim-endwise'
-Plug 'tpope/vim-eunuch'
-Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-projectionist'
-Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-rhubarb'
-Plug 'tpope/vim-surround'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-scripts/tComment'
-
-if filereadable(expand("~/.vimrc.bundles.local"))
-  source ~/.vimrc.bundles.local
-endif
-
-call plug#end()
