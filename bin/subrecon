@@ -1,42 +1,40 @@
 #!/bin/bash
-if [ "$EUID" -ne 0 ]
-  then echo "Run this script as root. Exiting."
-  exit 0
+# This script has the following dependencies:
+#   amass
+#   subfinder
+#   findomain
+if [ "$EUID" -ne 0 ]; then
+	echo "Run this script as root. Exiting."
+	exit 0
 fi
 
-echo "subrecon starting on $1 at $(date)" | notify -silent
+echo "subrecon starting on $1 at $(date)"
 
-mkdir -p "$DIR/recon/$1"
-project_directory="$DIR/recon/$1"
+project_directory="$(pwd)"
 
 # amass and subfinder
 subfinder_file=$(mktemp)
 amass_file=$(mktemp)
+findomain_file=$(mktemp)
 
 subfinder -d $1 -o $subfinder_file -all &>/dev/null &
 proc1=$!
+
 amass enum -passive -config /root/config.ini -d $1 -o $amass_file &>/dev/null &
 proc2=$!
 
+# findomain
+
 wait $proc1
 wait $proc2
+# wait $proc3
 
 # process files
 final_file=$project_directory/$1.subs
-cat $amass_file $subfinder_file | sort -u > $final_file
+cat $amass_file $subfinder_file $findomain_file | sort -u >$final_file
 
 rm $subfinder_file
 rm $amass_file
+rm $findomain_file
 
-# sub bruteforcing of apex
-puredns_file=$(mktemp)
-puredns bruteforce /opt/2m-subdomains.txt "$1" -r /root/resolvers.txt -w $puredns_file &>/dev/null
-cat $puredns_file | anew $final_file &>/dev/null
-rm $puredns_file
-
-httpx -nc -sc -cl -title -p 80,443,8000,8080,8443 -t 100 -retries 0 -o $project_directory/$1.httpx < $final_file &>/dev/null
-
-# this was causing an issue where no output was generated 
-# httpx -nc -sc -cl -title -p 80,443,8000,8080,8443 -t 100 -retries 0 -sr -srd $project_directory -store-chain -o $project_directory/$1.httpx < $final_file &>/dev/null
-
-echo "subrecon on $1 complete at $(date)" | notify -silent
+echo "subrecon on $1 complete at $(date)"
